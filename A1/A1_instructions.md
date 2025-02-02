@@ -1,4 +1,4 @@
-S1. Download all 10-k files from the SEC website: [sec_companysearch)(https://www.sec.gov/edgar/searchedgar/companysearch)
+S1. Download all 10-k files from the SEC website: [sec_companysearch](https://www.sec.gov/edgar/searchedgar/companysearch)
 
 | **Company Name**           | **Ticker** | **CIK**      |
 |----------------------------|--------------|--------------|
@@ -12,3 +12,7 @@ S1. Download all 10-k files from the SEC website: [sec_companysearch)(https://ww
 | The Coca-Cola Company     | KO           | 0000021344   | ❓
 | Procter & Gamble Co.      | PG           | 0000080424   |
 | Walmart Inc.              | WMT          | 0000104169   |
+
+So far, we've downloaded __8__ companies.
+
+Save all files as plain text (.html) and rename them in this format: __TICKER_10k__
