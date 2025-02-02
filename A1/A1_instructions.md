@@ -1,4 +1,4 @@
-S1. Download all 10-k files from the SEC website: [https://www.sec.gov/edgar/searchedgar/companysearch][SEC]
+S1. Download all 10-k files from the SEC website: [sec_companysearch)(https://www.sec.gov/edgar/searchedgar/companysearch)
 
 | **Company Name**           | **Ticker** | **CIK**      |
 |----------------------------|--------------|--------------|
