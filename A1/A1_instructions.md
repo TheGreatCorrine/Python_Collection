@@ -16,3 +16,4 @@ S1. Download all 10-k files from the SEC website: [sec_companysearch](https://ww
 So far, we've downloaded __8__ companies.
 
 Save all files as plain text (.html) and rename them in this format: __TICKER_10K__
+These HTML files should be the only HTML files we submit.
