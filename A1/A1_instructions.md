@@ -17,3 +17,6 @@ So far, we've downloaded __8__ companies.
 
 Save all files as plain text (.html) and rename them in this format: __TICKER_10K__
 These HTML files should be the only HTML files we submit.
+
+The `10-k html files` folder contains all the 10-k files from the 10 companies.
+Please upload them here.
