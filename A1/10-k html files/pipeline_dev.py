@@ -65,6 +65,10 @@ def clean_html(raw_html):
     >>> APPL2 = '''<span style="color:#000000;font-family:'Helvetica',sans-serif;font-size:9pt;font-weight:700;line-height:120%">SIGNATURES</span></div><div style="margin-top:12pt;text-align:justify"><span style="color:#000000;font-family:'Helvetica',sans-serif;font-size:9pt;font-weight:400;line-height:120%">Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned, thereunto duly authorized.</span></div><div style="margin-top:6pt;text-align:justify"><table style="border-collapse:collapse;display:inline-table;margin-bottom:5pt;vertical-align:text-bottom;width:100.000%"><tr><td style="width:1.0%"/><td style="width:56.794%"/><td style="width:0.1%"/><td style="width:1.0%"/><td style="width:2.847%"/><td style="width:0.1%"/><td style="width:0.1%"/><td style="width:2.139%"/><td style="width:0.1%"/><td style="width:1.0%"/><td style="width:34.720%"/><td style="width:0.1%"/></tr><tr><td colspan="3" style="padding:2px 1pt;text-align:left;vertical-align:bottom"><div><span style="color:#000000;font-family:'Helvetica',sans-serif;font-size:9pt;font-weight:400;line-height:100%">Date: November&#160;1, 2024</span>'''
     >>> clean_html(APPL2)
     'SIGNATURES Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned, thereunto duly authorized. Date: November 1, 2024'
+
+    >>> WMT = '''<span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:100%">/s/ C. Douglas McMillon</span></td></tr><tr><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:left;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:8pt;font-weight:400;line-height:100%">&#160;</span></td><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:left;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:8pt;font-weight:400;line-height:100%">&#160;</span></td><td colspan="3" style="border-top:1pt solid #000000;padding:2px 1pt;text-align:left;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:100%">C. Douglas McMillon</span></td></tr><tr><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:left;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:8pt;font-weight:400;line-height:100%">&#160;</span></td><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:left;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:8pt;font-weight:400;line-height:100%">&#160;</span></td><td colspan="3" style="padding:2px 1pt;text-align:left;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:100%">President and Chief Executive Officer</span></td></tr></table>'''
+    >>> clean_html(WMT)
+    '/s/ C. Douglas McMillon C. Douglas McMillon President and Chief Executive Officer'
     """
     # remove html tags
     clean_one = re.sub(r'<.*?>', ' ', raw_html)
@@ -110,21 +114,34 @@ def extract_signatures(text):
     signature_section_pattern = r"(SIGNATURES|Signatures)\s"
     pass
 
-def extract_fiscal_year(text):
-    """ 1. The date of the fiscal year-end (ensure it is formatted in ISO-format)
+def extract_signature_date(text):
+    """ 3. The date of signature(s) (ensure it is formatted in ISO-format).
 
-    Currently, relevant information is in the beginning of the document, e.g.:
-     'For the fiscal year ended January 31, 2024, or'
-     Search for the fiscal year and return it in ISO-format.
+    Find the SIGNATURES section
+    >>> test = 'SIGNATURES Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned, thereunto duly authorized. Date: November 1, 2024'
+    >>> extract_signature_date(test)
+    '2024-11-01'
+    >>> test_duplicates = 'SIGNATURES Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned, thereunto duly authorized. Date: November 1, 2024 Date: November 2, 2024'
+    >>> extract_signature_date(test_duplicates)
+    '2024-11-01'
+    >>> test_date_early = 'Date: November 10, 2023, SIGNATURES Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned, thereunto duly authorized. Date: November 1, 2023'
+    >>> extract_signature_date(test_date_early)
+    '2023-11-01'
+    >>> test_no_signature = ' Date: November 1, 2024'
+    >>> extract_signature_date(test_no_signature)
+    '2024-11-01'
+    >>> test_no_date = 'SIGNATURES'
+    >>> extract_signature_date(test_no_date)
+    'N/A'
+    >>> test_no_date = 'as of November 2, 2024, SIGNATURES Date: November 1, 2024'
+    >>> extract_signature_date(test_no_date)
+    'N/A'
+    """
+    signature_pattern = r"SIGNATURES.*?Pursuant to the requirements of Section.*?(?=EXHIBIT INDEX|$)"
+    signature_section_match = re.search(signature_pattern, text, re.DOTALL | re.IGNORECASE)
 
-     >>> extract_fiscal_year('For the fiscal year ended January 31, 2024, or')
-     '2024-01-31'
-     >>>
-     """
-    match = re.search(r"for the fiscal year ended (\w+\s\d{1,2},\s\d{4})", text, re.IGNORECASE)
-    if match:
-        fiscal_year_str = match.group(1)
-        fiscal_year_iso = convert_date(fiscal_year_str)
-    else:
-        fiscal_year_iso = 'N/A'
-    return fiscal_year_iso
+    if signature_section_match:
+        signature_section = signature_section_match.group(0)
+        signature_date_match = re.search(r"(?:Date:|as of)\s*(\w+\s\d{1,2}\s*,\s*\d{4})", signature_section)
+        return convert_date(signature_date_match.group(1)) if signature_date_match else 'N/A'
+    return 'N/A'
