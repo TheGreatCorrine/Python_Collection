@@ -50,8 +50,19 @@ def clean_html(raw_html):
     >>> GOOG = "For the fiscal year ended <ix:nonNumeric contextRef='c-1' name='dei:DocumentPeriodEndDate' format='ixt:date-monthname-day-year-en' id='f-4'><ix:nonNumeric contextRef='c-1' name='dei:CurrentFiscalYearEndDate' format='ixt:date-monthname-day-en' id='f-3'>December&#160;31</ix:nonNumeric>, 2023"
     >>> clean_html(GOOG)
     'For the fiscal year ended December 31 , 2023'
+
+    >>> AAPLS = '''SIGNATURES</span></div><div style='margin-top:12pt;text-align:justify'><span style='color:#000000;font-family:'Helvetica',sans-serif;font-size:9pt;font-weight:400;line-height:120%'>Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned, thereunto duly authorized.</span></div><div style='margin-top:6pt;text-align:justify'><table style='border-collapse:collapse;display:inline-table;margin-bottom:5pt;vertical-align:text-bottom;width:100.000%'><tr><td style='width:1.0%'/><td style='width:56.794%'/><td style='width:0.1%'/><td style='width:1.0%'/><td style='width:2.847%'/><td style='width:0.1%'/><td style='width:0.1%'/><td style='width:2.139%'/><td style='width:0.1%'/><td style='width:1.0%'/><td style='width:34.720%'/><td style='width:0.1%'/></tr><tr><td colspan="3" style='padding:2px 1pt;text-align:left;vertical-align:bottom'><div><span style='color:#000000;font-family:'Helvetica',sans-serif;font-size:9pt;font-weight:400;line-height:100%'>Date: November&#160;1, 2024</span>'''
+    >>> clean_html(AAPLS)
+    'SIGNATURES Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned, thereunto duly authorized. Date: November 1, 2024'
+
+    >>> Singers = '''<span style="color:#000000;font-family:'Helvetica',sans-serif;font-size:9pt;font-weight:400;line-height:100%">By:</span></td><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:left;vertical-align:bottom"><span style="color:#000000;font-family:'Helvetica',sans-serif;font-size:9pt;font-weight:400;line-height:100%">/s/ Luca Maestri</span>'''
+    >>> clean_html(Singers)
+    'By: /s/ Luca Maestri'
+
+    >>> AWS = '''SIGNATURES</span></div><div style="margin-top:5pt;text-indent:24.75pt"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:120%">Pursuant to the requirements of Section&#160;13 or 15(d) of the Securities Exchange Act of 1934, the registrant has duly caused this Report to be signed on its behalf by the undersigned, thereunto duly authorized, as of February&#160;1, 2024. </span>'''
+    >>> clean_html(AWS)
+    'SIGNATURES Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the registrant has duly caused this Report to be signed on its behalf by the undersigned, thereunto duly authorized, as of February 1, 2024.'
     """
-    # TODO: should 10-k be removed? what is the definition of html tags?
     # remove html tags
     clean_one = re.sub(r'<.*?>', ' ', raw_html)
     # remove html entities
