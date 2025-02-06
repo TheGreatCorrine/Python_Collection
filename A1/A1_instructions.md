@@ -20,3 +20,16 @@ These HTML files should be the only HTML files we submit.
 
 The `10-k html files` folder contains all the 10-k files from the 10 companies.
 Please upload them here.
+
+----------------
+## Some Python libraries you use:
+1. Pathlib
+```bash
+  from pathlib import Path
+```
+Another way to iterate all files in a folder:
+```bash
+    for file in Path('10-k html files').iterdir(): 
+    # iterates through all files in the folder.
+```
+2. 
