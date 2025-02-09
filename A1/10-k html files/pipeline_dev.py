@@ -28,7 +28,7 @@ for html_file in current_dictionary.glob('*.html'):
 """
 Step 2: Extract all necessary information from the 10-k files
 """
-def clean_html(raw_html):
+def clean_html(raw_html, remove_tags=True):
     """
     This function is used to clean the raw content
     >>> test = ('<html xmlns="http://www.w3.org/1999/xhtml"> <head>'
@@ -72,31 +72,81 @@ def clean_html(raw_html):
 
     >>> GOOGL = '''<span style="color:#000000;font-family:'Arial',sans-serif;font-size:10pt;font-weight:700;line-height:120%">SIGNATURES</span></div><div style="margin-top:9pt;text-align:justify;text-indent:24.75pt"><span style="color:#000000;font-family:'Arial',sans-serif;font-size:10pt;font-weight:400;line-height:120%">Pursuant to the requirements of Section&#160;13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this Annual Report on Form 10-K to be signed on its behalf by the undersigned, thereunto duly authorized.</span></div><div style="margin-top:9pt;text-align:justify;text-indent:22.5pt"><span style="color:#000000;font-family:'Arial',sans-serif;font-size:10pt;font-weight:400;line-height:120%">Date: February&#160;4, 2025 </span></div><div style="margin-top:6pt;text-align:justify;text-indent:22.5pt"><span style="color:#000000;font-family:'Arial',sans-serif;font-size:9pt;font-weight:400;line-height:120%">&#160;</span><table style="border-collapse:collapse;display:inline-table;margin-bottom:5pt;vertical-align:text-bottom;width:42.522%"><tr><td style="width:1.0%"/><td style="width:16.685%"/><td style="width:0.1%"/><td style="width:1.0%"/><td style="width:81.115%"/><td style="width:0.1%"/></tr><tr><td colspan="6" style="padding:2px 1pt;text-align:left;vertical-align:bottom"><span style="color:#000000;font-family:'Arial',sans-serif;font-size:10pt;font-weight:700;line-height:100%">ALPHABET INC.</span></td></tr><tr><td colspan="3" style="padding:2px 1pt;text-align:left;vertical-align:top"><span style="color:#000000;font-family:'Arial',sans-serif;font-size:10pt;font-weight:400;line-height:100%">By:</span></td><td colspan="3" style="padding:2px 1pt;text-align:left;vertical-align:bottom"><div style="text-align:center"><span style="color:#000000;font-family:'Arial',sans-serif;font-size:10pt;font-weight:400;line-height:100%">/</span><span style="color:#000000;font-family:'Arial',sans-serif;font-size:8pt;font-weight:400;line-height:100%">S</span><span style="color:#000000;font-family:'Arial',sans-serif;font-size:10pt;font-weight:400;line-height:100%">/&#160;&#160;&#160;&#160;S</span><span style="color:#000000;font-family:'Arial',sans-serif;font-size:8pt;font-weight:400;line-height:100%">UNDAR</span><span style="color:#000000;font-family:'Arial',sans-serif;font-size:10pt;font-weight:400;line-height:100%"> P</span><span style="color:#000000;font-family:'Arial',sans-serif;font-size:8pt;font-weight:400;line-height:100%">ICHAI&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span></div></td></tr><tr><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="border-top:1pt solid #000000;padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Arial',sans-serif;font-size:8pt;font-weight:400;line-height:100%">Sundar Pichai</span></td></tr><tr><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Arial',sans-serif;font-size:8pt;font-weight:400;line-height:100%">Chief Executive Officer<br/>(Principal Executive Officer of the Registrant)</span></td></tr></table></div>'''
     >>> clean_html(GOOGL)
-    'SIGNATURES Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this Annual Report on Form 10-K to be signed on its behalf by the undersigned, thereunto duly authorized. Date: February 4, 2025 ALPHABET INC. By: /S/ Sundar Pichai Chief Executive Officer (Principal Executive Officer of the Registrant)'
+    ' SIGNATURES Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this Annual Report on Form 10-K to be signed on its behalf by the undersigned, thereunto duly authorized. Date: February 4, 2025 ALPHABET INC. By: /s/ SUNDAR PICHAI Sundar Pichai Chief Executive Officer (Principal Executive Officer of the Registrant)'
 
-    >>> TSLA = '''<span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:114%">/s/ Elon Musk</span></td></tr><tr><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="border-top:0.5pt solid #000000;padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:114%">Elon Musk</span></td></tr><tr><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:114%">Chief Executive Officer</span></td></tr><tr><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:114%">(Principal Executive Officer)</span></td></tr></table></div><div style="margin-top:12pt;text-indent:27.74pt"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:120%">Pursuant to the requirements of the Securities Exchange Act of 1934, this report has been signed below by the following persons on behalf of the registrant and in the capacities and on the dates indicated.</span></div><div style="margin-top:12pt"><table style="border-collapse:collapse;display:inline-table;margin-bottom:5pt;vertical-align:text-bottom;width:100.000%"><tr><td style="width:1.0%"/><td style="width:26.021%"/><td style="width:0.1%"/><td style="width:0.1%"/><td style="width:0.406%"/><td style="width:0.1%"/><td style="width:1.0%"/><td style="width:43.445%"/><td style="width:0.1%"/><td style="width:0.1%"/><td style="width:0.406%"/><td style="width:0.1%"/><td style="width:1.0%"/><td style="width:26.022%"/><td style="width:0.1%"/></tr><tr><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:8pt;font-weight:700;line-height:114%">Signature</span></td><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:8pt;font-weight:700;line-height:114%">Title</span></td><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:8pt;font-weight:700;line-height:114%">Date</span></td></tr><tr><td colspan="3" style="border-top:0.5pt solid #000000;padding:2px 1pt;text-align:left;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:6pt;font-weight:400;line-height:114%">&#160;</span></td><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="border-top:0.5pt solid #000000;padding:2px 1pt;text-align:left;vertical-align:top"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:6pt;font-weight:400;line-height:114%">&#160;</span></td><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="border-top:0.5pt solid #000000;padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:6pt;font-weight:400;line-height:114%">&#160;</span></td></tr><tr><td colspan="3" style="padding:2px 1pt;text-align:left;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:114%">/s/ Elon Musk</span></td><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:left;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:114%">Chief Executive Officer and Director (Principal Executive Officer)</span></td>'''
-    >>> clean_html(TSLA)
-    '/s/ Elon Musk Elon Musk Chief Executive Officer and Director (Principal Executive Officer)'
+    >>> clean_html(GOOGL, remove_tags=False)
+
+    >>> MSFT = ''' <p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:center;" id="signatures"><span style="color:#000000;white-space:pre-wrap;font-weight:bold;font-size:10pt;font-family:Arial;min-width:fit-content;">SIGNAT</span><span style="color:#000000;white-space:pre-wrap;font-weight:bold;font-size:10pt;font-family:Arial;min-width:fit-content;">URES</span></p> <p style="font-size:10pt;margin-top:9pt;font-family:Times New Roman;margin-bottom:0;text-align:justify;"><span style="color:#000000;white-space:pre-wrap;font-size:10pt;font-family:Arial;min-width:fit-content;">Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned; thereunto duly authorized, in the City of Redmond, State of Washington, on July 30, 2024.</span><span style="color:#000000;white-space:pre-wrap;font-size:10pt;font-family:Arial;min-width:fit-content;"> </span></p>'''
+    >>> clean_html(MSFT)
+
+    >>> clean_html(LONG_MSFT)
+    ' SIGNATURES Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned; thereunto duly authorized, in the City of Redmond, State of Washington, on July 30, 2024. MICROSOFT CORPORATION /s/ ALICE L. JOLLA'
+
+    >>> clean_html(TSLA, remove_tags=False)
+
+
     """
-    # remove html tags
-    clean_one = re.sub(r'<.*?>', ' ', raw_html)
-    # remove html entities
-    clean_two = re.sub(r'&\w+;', ' ', clean_one)
-    clean_two = re.sub(r'&nbsp;', ' ', clean_two)
-    clean_two = re.sub(r'&amp;', '&', clean_two)
-    # 去除所有 HTML 实体（如 &#160;）
-    clean_two = re.sub(r'&#\d+;', ' ', clean_two)
+    # # remove html tags
+    # clean_one = re.sub(r'<.*?>', ' ', raw_html)
+    # # remove html entities
+    # clean_two = re.sub(r'&\w+;', ' ', clean_one)
+    # clean_two = re.sub(r'&nbsp;', ' ', clean_two)
+    # clean_two = re.sub(r'&amp;', '&', clean_two)
+    # # 去除所有 HTML 实体（如 &#160;）
+    # clean_two = re.sub(r'&#\d+;', ' ', clean_two)
+    #
+    # # clean_two = html.unescape(clean_two) 去除所有 HTML 实体（如 &nbsp;）的包
+    #
+    # clean_three = re.sub(r"&[a-z]+;", " ", clean_two)
+    #
+    # # remove urls
+    # clean_three = re.sub(r"\(http[s]?://\S+\)", "", clean_three)
+    # clean_three = re.sub(r"http[s]?://\S+", "", clean_three)
+    # # remove multiple spaces
+    # clean_four = re.sub(r'\s+', ' ', clean_three)
+    # return clean_four.strip()
+    if remove_tags:
+        # remove HTML tags
+        cleaned_html = re.sub(r'<.*?>', ' ', raw_html)
+        # remove HTML entities
+        cleaned_html = re.sub(r'&\w+;', ' ', cleaned_html)
+        cleaned_html = re.sub(r"&[a-z]+;", " ", cleaned_html)
 
-    # clean_two = html.unescape(clean_two) 去除所有 HTML 实体（如 &nbsp;）的包
+    else:
+        cleaned_html = re.sub(r'(<br\s*/?>|</div>|</p>|</tr>|</li>|</table>|</td>)', '\n', raw_html, flags=re.IGNORECASE)
+        cleaned_html = re.sub(r'<(?!/)[^>]+>', '', cleaned_html, flags=re.IGNORECASE) # do not remove <\span>
+        # Remove <span> tags that are immediately between non-whitespace characters
+        cleaned_html = re.sub(r'(?<=\S)<span>(?=\S)', '', cleaned_html)
 
-    clean_three = re.sub(r"&[a-z]+;", " ", clean_two)
+        # Remove </span> tags that are immediately between non-whitespace characters
+        cleaned_html = re.sub(r'(?<=\S)</span>(?=\s)', '', cleaned_html)
+
+        cleaned_html = re.sub(r'(?<=\S)</span>(?=\S)', '', cleaned_html)
+        # cleaned_html = re.sub(r'(?<=\S)</span>(?=\s(?!\S))', '', cleaned_html)
+
+    # replace HTML entities (&#160;）with space
+    cleaned_html = re.sub(r'&#\d+;|nbsp', ' ', cleaned_html)
+    cleaned_html = re.sub(r'\s+', ' ', cleaned_html)
 
     # remove urls
-    clean_three = re.sub(r"\(http[s]?://\S+\)", "", clean_three)
-    clean_three = re.sub(r"http[s]?://\S+", "", clean_three)
+    cleaned_url = re.sub(r"\(http[s]?://\S+\)", "", cleaned_html)
+    cleaned_url = re.sub(r"http[s]?://\S+", "", cleaned_url)
+
     # remove multiple spaces
-    clean_four = re.sub(r'\s+', ' ', clean_three)
-    return clean_four.strip()
+    cleaned_space = re.sub(r'\s+', ' ', cleaned_url)
+
+    # fix the error that /s/ is splitted into / s / in GOOG_10-K_2021.html
+    clean_spe = re.sub(r'/\s*S\s*/', '/s/', cleaned_space, flags=re.IGNORECASE)
+
+    # fix the error: ALICE is splitted into multiple A LICE in MSFT_10-K_2021.html
+    clean_spe = re.sub(r'(\b[A-Z])\s([A-Z]{2,}\b)', r'\1\2', clean_spe)
+
+    # fix the error: can not find the signature section in MSFT_10-K_2021.html
+    cleaned = re.sub(r'SIGNAT\s*URES', 'SIGNATURES', clean_spe, flags=re.IGNORECASE)
+
+    return cleaned.strip()
+
+
 
 with open('AAPL_10K.html') as file:
     raw_content = file.read()
@@ -188,3 +238,27 @@ def extract_signers(text):
         text = re.sub(re.escape(match.group(0)), '', text, flags=re.IGNORECASE)
 
     return cleaned_signers
+
+
+LONG_MSFT = """
+    <p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:center;" id="signatures"><span style="color:#000000;white-space:pre-wrap;font-weight:bold;font-size:10pt;font-family:Arial;min-width:fit-content;">SIGNAT</span><span style="color:#000000;white-space:pre-wrap;font-weight:bold;font-size:10pt;font-family:Arial;min-width:fit-content;">URES</span></p>
+  <p style="font-size:10pt;margin-top:9pt;font-family:Times New Roman;margin-bottom:0;text-align:justify;"><span style="color:#000000;white-space:pre-wrap;font-size:10pt;font-family:Arial;min-width:fit-content;">Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned; thereunto duly authorized, in the City of Redmond, State of Washington, on July 30, 2024.</span><span style="color:#000000;white-space:pre-wrap;font-size:10pt;font-family:Arial;min-width:fit-content;"> </span></p>
+  <p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="white-space:pre-wrap;font-size:9pt;font-family:Arial;min-width:fit-content;">&#160;</span></p>
+  <table style="border-spacing:0;table-layout:fixed;width:50.0%;border-collapse:separate;">
+   <tr style="visibility:collapse;">
+    <td style="width:100%;"/>
+   </tr>
+   <tr style="height:10pt;white-space:pre-wrap;word-break:break-word;text-align:right;">
+    <td style="padding-top:0.01in;vertical-align:top;padding-right:0.01in;"><p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:justify;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">M</span><span style="color:#000000;white-space:pre-wrap;font-size:7.5pt;font-family:Arial;min-width:fit-content;">ICROSOFT</span><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">&#160;C</span><span style="color:#000000;white-space:pre-wrap;font-size:7.5pt;font-family:Arial;min-width:fit-content;">ORPORATION</span></p></td>
+   </tr>
+   <tr style="white-space:pre-wrap;word-break:break-word;">
+    <td style="padding-top:0.01in;vertical-align:middle;padding-right:0.01in;"><p style="font-size:9pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="white-space:pre-wrap;font-family:Arial;min-width:fit-content;">&#160;</span></p></td>
+   </tr>
+   <tr style="height:10pt;white-space:pre-wrap;word-break:break-word;text-align:right;">
+    <td style="padding-top:0.01in;vertical-align:top;border-bottom:0.5pt solid;padding-right:0.01in;"><p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:justify;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">/s/ A</span><span style="color:#000000;white-space:pre-wrap;font-size:7.5pt;font-family:Arial;min-width:fit-content;">LICE</span><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">&#160;L. J</span><span style="color:#000000;white-space:pre-wrap;font-size:7.5pt;font-family:Arial;min-width:fit-content;">OLLA</span></p></td>
+   </tr>
+    """
+
+TSLA = """
+SIGNATURES</span></div><div style="margin-top:12pt;text-indent:27.74pt"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:120%">Pursuant to the requirements of Section 13 or 15(d) the Securities Exchange Act of 1934, the registrant has duly caused this report to be signed on its behalf by the undersigned, thereunto duly authorized.</span></div><div style="margin-top:12pt"><table style="border-collapse:collapse;display:inline-table;margin-bottom:5pt;vertical-align:text-bottom;width:100.000%"><tr><td style="width:1.0%"/><td style="width:58.445%"/><td style="width:0.1%"/><td style="width:1.0%"/><td style="width:39.355%"/><td style="width:0.1%"/></tr><tr><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:114%">Tesla, Inc.</span></td></tr><tr><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:9pt;font-weight:400;line-height:114%">&#160;</span></td></tr><tr><td colspan="3" style="padding:2px 1pt;text-align:left;vertical-align:bottom"><div><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:114%">Date: January&#160;29, 2025</span></div></td><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:114%">/s/ Elon Musk</span></td></tr><tr><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="border-top:0.5pt solid #000000;padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:114%">Elon Musk</span></td></tr><tr><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:114%">Chief Executive Officer</span></td></tr><tr><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:114%">(Principal Executive Officer)</span></td></tr></table></div><div style="margin-top:12pt;text-indent:27.74pt"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:10pt;font-weight:400;line-height:120%">Pursuant to the requirements of the Securities Exchange Act of 1934, this report has been signed below by the following persons on behalf of the registrant and in the capacities and on the dates indicated.</span></div><div style="margin-top:12pt"><table style="border-collapse:collapse;display:inline-table;margin-bottom:5pt;vertical-align:text-bottom;width:100.000%"><tr><td style="width:1.0%"/><td style="width:26.021%"/><td style="width:0.1%"/><td style="width:0.1%"/><td style="width:0.406%"/><td style="width:0.1%"/><td style="width:1.0%"/><td style="width:43.445%"/><td style="width:0.1%"/><td style="width:0.1%"/><td style="width:0.406%"/><td style="width:0.1%"/><td style="width:1.0%"/><td style="width:26.022%"/><td style="width:0.1%"/></tr><tr><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:8pt;font-weight:700;line-height:114%">Signature</span></td><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom"><span style="color:#000000;font-family:'Times New Roman',sans-serif;font-size:8pt;font-weight:700;line-height:114%">Title</span></td><td colspan="3" style="padding:0 1pt"/><td colspan="3" style="padding:2px 1pt;text-align:center;vertical-align:bottom>
+"""
