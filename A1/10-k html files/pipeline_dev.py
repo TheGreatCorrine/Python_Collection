@@ -82,6 +82,8 @@ def clean_html(raw_html, remove_tags=True):
     >>> clean_html(LONG_MSFT)
     ' SIGNATURES Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned; thereunto duly authorized, in the City of Redmond, State of Washington, on July 30, 2024. MICROSOFT CORPORATION /s/ ALICE L. JOLLA'
 
+    >>> clean_html(LONG_MSFT, False)
+
     >>> clean_html(TSLA, remove_tags=False)
 
 
@@ -113,15 +115,15 @@ def clean_html(raw_html, remove_tags=True):
         cleaned_html = re.sub(r"&[a-z]+;", " ", cleaned_html)
 
     else:
-        cleaned_html = re.sub(r'(<br\s*/?>|</div>|</p>|</tr>|</li>|</table>|</td>)', '\n', raw_html, flags=re.IGNORECASE)
+        cleaned_html = re.sub(r'(<br\s*/?>|</div>|</p>|</span>|</li>|</table>)', '\n', raw_html, flags=re.IGNORECASE)
         cleaned_html = re.sub(r'<(?!/)[^>]+>', '', cleaned_html, flags=re.IGNORECASE) # do not remove <\span>
         # Remove <span> tags that are immediately between non-whitespace characters
-        cleaned_html = re.sub(r'(?<=\S)<span>(?=\S)', '', cleaned_html)
-
-        # Remove </span> tags that are immediately between non-whitespace characters
-        cleaned_html = re.sub(r'(?<=\S)</span>(?=\s)', '', cleaned_html)
-
-        cleaned_html = re.sub(r'(?<=\S)</span>(?=\S)', '', cleaned_html)
+        # cleaned_html = re.sub(r'(?<=\S)<span>(?=\S)', '', cleaned_html)
+        #
+        # # Remove </span> tags that are immediately between non-whitespace characters
+        # cleaned_html = re.sub(r'(?<=\S)</span>(?=\s)', '', cleaned_html)
+        #
+        # cleaned_html = re.sub(r'(?<=\S)</span>(?=\S)', '', cleaned_html)
         # cleaned_html = re.sub(r'(?<=\S)</span>(?=\s(?!\S))', '', cleaned_html)
 
     # replace HTML entities (&#160;）with space
@@ -241,7 +243,7 @@ def extract_signers(text):
 
 
 LONG_MSFT = """
-    <p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:center;" id="signatures"><span style="color:#000000;white-space:pre-wrap;font-weight:bold;font-size:10pt;font-family:Arial;min-width:fit-content;">SIGNAT</span><span style="color:#000000;white-space:pre-wrap;font-weight:bold;font-size:10pt;font-family:Arial;min-width:fit-content;">URES</span></p>
+ <p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:center;" id="signatures"><span style="color:#000000;white-space:pre-wrap;font-weight:bold;font-size:10pt;font-family:Arial;min-width:fit-content;">SIGNAT</span><span style="color:#000000;white-space:pre-wrap;font-weight:bold;font-size:10pt;font-family:Arial;min-width:fit-content;">URES</span></p>
   <p style="font-size:10pt;margin-top:9pt;font-family:Times New Roman;margin-bottom:0;text-align:justify;"><span style="color:#000000;white-space:pre-wrap;font-size:10pt;font-family:Arial;min-width:fit-content;">Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned; thereunto duly authorized, in the City of Redmond, State of Washington, on July 30, 2024.</span><span style="color:#000000;white-space:pre-wrap;font-size:10pt;font-family:Arial;min-width:fit-content;"> </span></p>
   <p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="white-space:pre-wrap;font-size:9pt;font-family:Arial;min-width:fit-content;">&#160;</span></p>
   <table style="border-spacing:0;table-layout:fixed;width:50.0%;border-collapse:separate;">
@@ -256,6 +258,52 @@ LONG_MSFT = """
    </tr>
    <tr style="height:10pt;white-space:pre-wrap;word-break:break-word;text-align:right;">
     <td style="padding-top:0.01in;vertical-align:top;border-bottom:0.5pt solid;padding-right:0.01in;"><p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:justify;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">/s/ A</span><span style="color:#000000;white-space:pre-wrap;font-size:7.5pt;font-family:Arial;min-width:fit-content;">LICE</span><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">&#160;L. J</span><span style="color:#000000;white-space:pre-wrap;font-size:7.5pt;font-family:Arial;min-width:fit-content;">OLLA</span></p></td>
+   </tr>
+   <tr style="height:10pt;white-space:pre-wrap;word-break:break-word;text-align:right;">
+    <td style="padding-top:0.01in;vertical-align:bottom;padding-right:0.01in;"><p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:justify;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">Alice L. Jolla</span></p></td>
+   </tr>
+   <tr style="height:10pt;white-space:pre-wrap;word-break:break-word;">
+    <td style="padding-top:0.01in;vertical-align:bottom;padding-right:0.01in;"><p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">Corporate Vice President and Chief Accounting Officer (Principal Accounting Officer)</span></p></td>
+   </tr>
+  </table>
+  <p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="white-space:pre-wrap;font-size:9pt;font-family:Arial;min-width:fit-content;">&#160;</span></p>
+  <p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:justify;"><span style="color:#000000;white-space:pre-wrap;font-size:10pt;font-family:Arial;min-width:fit-content;">Pursuant to the requirements of the Securities Exchange Act of 1934, this report has been signed below by the following persons on behalf of Registrant and in the capacities indicated on July 30, 2024.</span><span style="color:#000000;white-space:pre-wrap;font-size:10pt;font-family:Arial;min-width:fit-content;"> </span></p>
+  <p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="white-space:pre-wrap;font-size:9pt;font-family:Arial;min-width:fit-content;">&#160;</span></p>
+  <table style="margin-left:auto;border-spacing:0;table-layout:fixed;width:100.0%;border-collapse:separate;margin-right:auto;">
+   <tr style="background-color:#ffffff;font-weight:bold;visibility:collapse;">
+    <td style="width:49%;"/>
+    <td style="width:1%;"/>
+    <td style="width:50%;"/>
+   </tr>
+   <tr style="height:7pt;white-space:pre-wrap;word-break:break-word;">
+    <td style="vertical-align:bottom;"><p style="font-size:7.5pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-weight:bold;font-family:Arial;min-width:fit-content;">Signature</span></p></td>
+    <td style="vertical-align:bottom;"><p style="font-size:7.5pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;"> </span></p></td>
+    <td style="padding-left:0.01in;vertical-align:bottom;padding-right:0.01in;"><p style="font-size:7.5pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-weight:bold;font-family:Arial;min-width:fit-content;">Title</span></p></td>
+   </tr>
+   <tr style="height:4pt;white-space:pre-wrap;word-break:break-word;">
+    <td colspan="3" style="vertical-align:bottom;border-bottom:0.5pt solid;"><p style="font-size:4pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;"> </span></p></td>
+   </tr>
+   <tr style="height:4pt;white-space:pre-wrap;word-break:break-word;">
+    <td style="vertical-align:middle;"><p style="font-size:4pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;"> </span></p></td>
+    <td colspan="2" style="vertical-align:middle;"><p style="font-size:4pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="white-space:pre-wrap;font-family:Arial;min-width:fit-content;">&#160;</span></p></td>
+   </tr>
+   <tr style="height:10pt;white-space:pre-wrap;word-break:break-word;">
+    <td style="vertical-align:top;"><p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">/s/ S</span><span style="color:#000000;white-space:pre-wrap;font-size:7.5pt;font-family:Arial;min-width:fit-content;">ATYA</span><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">&#160;N</span><span style="color:#000000;white-space:pre-wrap;font-size:7.5pt;font-family:Arial;min-width:fit-content;">ADELLA</span></p></td>
+    <td style="vertical-align:bottom;"><p style="font-size:7.5pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;"> </span></p></td>
+    <td rowspan="2" style="vertical-align:top;"><p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">Chairman and Chief Executive Officer</span></p><p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">(Principal Executive Officer)</span></p></td>
+   </tr>
+   <tr style="height:10pt;white-space:pre-wrap;word-break:break-word;">
+    <td style="vertical-align:top;"><p style="border-top:0.75pt solid;padding-top:1pt;font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">Satya Nadella</span></p></td>
+    <td style="vertical-align:bottom;"><p style="font-size:7.5pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="white-space:pre-wrap;font-family:Arial;min-width:fit-content;">&#160;</span></p></td>
+   </tr>
+   <tr style="height:4pt;white-space:pre-wrap;word-break:break-word;">
+    <td style="vertical-align:middle;"><p style="font-size:4pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;"> </span></p></td>
+    <td colspan="2" style="vertical-align:middle;"><p style="font-size:4pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="white-space:pre-wrap;font-family:Arial;min-width:fit-content;">&#160;</span></p></td>
+   </tr>
+   <tr style="height:10pt;white-space:pre-wrap;word-break:break-word;">
+    <td style="vertical-align:top;"><p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">/s/ R</span><span style="color:#000000;white-space:pre-wrap;font-size:7.5pt;font-family:Arial;min-width:fit-content;">EID</span><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">&#160;H</span><span style="color:#000000;white-space:pre-wrap;font-size:7.5pt;font-family:Arial;min-width:fit-content;">OFFMAN</span></p></td>
+    <td style="vertical-align:bottom;"><p style="font-size:7.5pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="white-space:pre-wrap;font-family:Arial;min-width:fit-content;">&#160;</span></p></td>
+    <td rowspan="2" style="vertical-align:top;"><p style="font-size:10pt;margin-top:0;font-family:Times New Roman;margin-bottom:0;text-align:left;"><span style="color:#000000;white-space:pre-wrap;font-family:Arial;min-width:fit-content;">Director</span></p></td>
    </tr>
     """
 
