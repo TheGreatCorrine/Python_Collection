@@ -1,5 +1,9 @@
-# RSM317 Group Assignment 2 - Sentiment Analysis on Product Quality
-# Complete implementation with binary and multi-class prediction
+# Group 6 - Corrine and Jessica
+# Complete implementation with both binary and multi-class prediction
+# We reimplement (customize )the entire pipeline with Vader sentiment analysis tools
+# The binary model has an accuracy of 0.90 and the multi-class model has an accuracy of 0.69
+# Just click on 'run' and you will see the results of the analysis in the terminal.
+
 
 import pandas as pd
 import numpy as np
@@ -298,23 +302,17 @@ class TextPreprocessor:
         IMPORTANT: Uses raw text (with contractions) for VADER analysis
         and processed text (with expanded contractions) for TF-IDF features
         """
-        print(f"Preprocessing {df.shape[0]} reviews...")
         df_processed = df.copy()
 
         # Process text columns for TF-IDF features
-        print(f"Processing {summary_col} column...")
         df_processed[f'{summary_col}_processed'] = df_processed[summary_col].apply(self.preprocess_text)
 
-        print(f"Processing {text_col} column...")
         df_processed[f'{text_col}_processed'] = df_processed[text_col].apply(self.preprocess_text)
 
         # Combine processed columns
         df_processed['combined_text'] = df_processed[f'{summary_col}_processed'] + ' ' + df_processed[
             f'{text_col}_processed']
 
-        # Add VADER features using RAW text (not preprocessed)
-        # This preserves contractions for VADER's native handling
-        print("Adding VADER sentiment features...")
         vader_scores = []
 
         for _, row in df.iterrows():
@@ -530,7 +528,7 @@ class SentimentModel:
         plt.xlabel('Predicted Score')
         plt.ylabel('True Score')
         plt.title('Multi-class Confusion Matrix')
-        plt.savefig('multiclass_confusion_matrix.png')
+        plt.savefig('Bonus_multiclass_confusion_matrix.png')
         plt.close()
 
         return history
@@ -608,31 +606,6 @@ def analyze_negative_reviews(df, preprocessor):
     print("\nVADER compound score statistics by Score:")
     print(score_stats)
 
-    print("\n" + "=" * 80)
-    print("BUSINESS INSIGHTS SUMMARY")
-    print("=" * 80)
-
-    print("""
-1. Most frequent words associated with negative reviews and underlying problems:
-   - Product quality words like "poor", "bad", "disappointing" suggest fundamental issues
-   - Words related to taste/flavor indicate sensory issues with food products
-   - Terms like "waste", "money", "return" point to value perception problems
-   - Words like "customer service" suggest support-related issues
-
-2. Recurring phrases that indicate product defects or poor customer service:
-   - "stopped working", "doesn't work" - reliability issues
-   - "poor quality", "bad taste" - quality issues
-   - "waste money", "not worth" - value issues
-   - "customer service", "never again" - service issues
-
-3. Strategic recommendations based on recurring negative-review patterns:
-   - Improve quality control processes to address frequently mentioned defects
-   - Enhance taste testing protocols for food products
-   - Improve customer service response times and accessibility
-   - Review pricing strategy for products with high "not worth the money" mentions
-   - Create clearer product documentation and instructions
-   - Implement a systematic way to incorporate negative feedback into product improvement
-    """)
 
     return negative_word_freq, negative_bigram_freq
 
@@ -640,25 +613,17 @@ def analyze_negative_reviews(df, preprocessor):
 def main():
     """
     Main function to execute the complete sentiment analysis pipeline
+    Just click on 'run' and you will see the results of the analysis in the terminal.
     """
     print("=" * 80)
-    print("RSM317 GROUP ASSIGNMENT 2 - SENTIMENT ANALYSIS ON PRODUCT QUALITY")
+    print("BONUS - Both Binary and Multi-class Sentiment Analysis")
     print("=" * 80)
 
     # Load data
-    print("\nLoading data...")
     train_data = pd.read_csv('ReviewsTraining.csv')
     test_data = pd.read_csv('ReviewsTest.csv')
 
-    print(f"Training data shape: {train_data.shape}")
-    print(f"Test data shape: {test_data.shape}")
-
-    # Display score distribution
-    print("\nScore distribution in training data:")
-    score_counts = train_data['Score'].value_counts().sort_index()
-    print(score_counts)
-
-    # Visualize score distribution
+    # Visualize current score distribution
     plt.figure(figsize=(10, 6))
     ax = sns.countplot(x='Score', data=train_data)
     plt.title('Distribution of Review Scores')
@@ -669,32 +634,16 @@ def main():
                     (p.get_x() + p.get_width() / 2., p.get_height()),
                     ha='center', va='baseline',
                     xytext=(0, 5), textcoords='offset points')
-    plt.savefig('score_distribution.png')
+    plt.savefig('Bonus_score_distribution.png')
     plt.close()
 
     # Initialize text preprocessor
     preprocessor = TextPreprocessor()
 
-    # Test contraction expansion with examples
-    print("\nTesting contraction expansion:")
-    examples = [
-        "I can't believe it's not butter!",
-        "I don't know what I'd do without you.",
-        "He won't be able to attend, but she'll be there."
-    ]
-    for example in examples:
-        print(f"Original: {example}")
-        print(f"Expanded: {preprocessor.expand_contractions(example)}")
-        print()
-
     # Preprocess data
     train_processed = preprocessor.preprocess_dataframe(train_data)
     test_processed = preprocessor.preprocess_dataframe(test_data)
 
-    # Display a sample of preprocessed data
-    print("\nSample of preprocessed training data:")
-    sample_cols = ['Summary', 'Summary_processed', 'Text', 'Text_processed', 'weighted_compound', 'Score']
-    print(train_processed[sample_cols].head(2))
 
     # Create binary labels (1-3 = negative, 4-5 = positive)
     train_processed['sentiment_binary'] = train_processed['Score'].apply(lambda x: 1 if x >= 4 else 0)
@@ -703,9 +652,7 @@ def main():
     model = SentimentModel(use_vader=True)
 
     # Create feature matrices
-    print("\nCreating feature matrices...")
     X_train = model.create_feature_matrix(train_processed, is_training=True)
-    print(f"Training feature matrix shape: {X_train.shape}")
 
     # Prepare labels for binary and multi-class models
     y_binary = train_processed['sentiment_binary'].values
@@ -745,7 +692,7 @@ def main():
     plt.legend()
 
     plt.tight_layout()
-    plt.savefig('model_histories.png')
+    plt.savefig('Bonus_model_histories.png')
     plt.close()
 
     # Analyze test data
@@ -763,9 +710,9 @@ def main():
     multiclass_predictions = model.predict_multiclass(X_test)
 
     # Save predictions to file
-    team_number = "X"  # Replace with your team number
-    binary_output_file = f'Team{team_number}predictions.txt'
-    multiclass_output_file = f'Team{team_number}multiclass_predictions.txt'
+    team_number = "6"  # Replace with your team number
+    binary_output_file = f'Bonus_Team{team_number}predictions.txt'
+    multiclass_output_file = f'Bonus_Team{team_number}multiclass_predictions.txt'
 
     np.savetxt(binary_output_file, binary_predictions, fmt='%d')
     np.savetxt(multiclass_output_file, multiclass_predictions, fmt='%d')
