@@ -1,0 +1,38 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2821
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\csgray\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww12380\viewh12040\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf2 By using Bigram, adjacent two words (pairs of words) provide more information about given reviews. For example, \'93not good\'94 is a common negative expression, but observing \'93not\'94 and \'93like\'94 separately (using Unigram) is hard for us to distinguish whether customers like or do not like products. However, Bigram often leads to a sparse feature matrix and creates repetitions of words. Also, more features mean an increased risk of overfitting, which will even decrease the model accuracy.\
+By using Unigram, the procedure is straightforward and simpler compared to Bigram. Memory usage by the Unigram method is less than Bigram. Some phrases may be split into two unrelated words, such as \'93green tea,\'94 because of the loss of context mentioned before.\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+Challenges\
+- Sarcasm is often used in reviews, especially negative reviews. It is difficult to capture that in a large dataset unless we know the relationship or specific content of a sentence.\
+- Bigram has a higher risk of overfitting, which may lead to a decline in our model\'92s accuracy. This is an important part we need to pay attention to.\
+\
+Business Insights\
+1. What are the most frequent words associated with negative reviews? What are the main\
+areas of underlying problems that are reflected in these words?\
+- Unigram method top five frequent words in negative reviews: not, like, taste, product, would\
+- Bigram method top five frequent words in negative reviews: taste like, not good, would not, not buy, could not\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+- \'93Not\'94 or \'93would not\'94 or \'93could not\'94: a common way to express negatively. We keep that to make our results more accurate. If we remove \'93not\'94 by generally removing the stopwords, it is hard to distinguish \'93not like\'94 and \'93like\'94 after cleaning the text, which is important for Bigram. Therefore, we can observe \'93not good\'94 and \'93not buy\'94 in the top five frequent words by applying the Bigram method and these suggest fundamental issues of products.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+- \'93Like\'94: a very common word to express the satisfaction of a product. It frequently appears in negative reviews because some expressions, such as \'93not like,\'94 would be tokenized to \'93like\'94 by unigram. Thus, this may also suggest fundamental issues of products\
+- \'93Taste\'94 or \'93Taste like\'94: for reviews of food, people usually describe the flavour of that food, so they appear frequently in reviews. These are related to sensory issues with food products.\
+- \'93Product\'94: all the reviews are related to products, so it appears very often but is not very useful for giving any sentimental information.\
+\
+2. Are there recurring phrases that indicate product defects or poor customer service?\
+- \'93not good\'94, \'93not buy\'94, \'93not like\'94, \'93not sure\'94: quality issues\
+- \'93taste like\'94, \'93not taste\'94, \'93taste not\'94, \'93flavor not\'94: taste or flavour issues, maybe quality issues\
+- \'93not get\'94: related to expectations of products or service issues\
+\
+3. Based on the recurring negative-review patterns, what specific improvements or\
+strategic changes would you recommend to address these concerns?\
+- Need to improve quality control processes, which is a very frequently mentioned defect. Improving the quality of products would attract more customers to buy and reduce some negative reviews.\
+- May try another recipe or try other ingredients to improve the taste. Also, it is important to enhance the taste-testing process and collect ideas from those customers to improve products.\
+- Make a survey or feedback form for customers to collect information about their expectations for products and try to approach the expectations to keep regular customers and attract more potential customers.\
+- Improve customer service response times and accessibility and communication with logistics.}
