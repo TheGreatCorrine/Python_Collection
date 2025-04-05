@@ -1,13 +1,11 @@
 import os
 import re
 import numpy as np
-import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA, LatentDirichletAllocation, TruncatedSVD
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.preprocessing import normalize
-import matplotlib.pyplot as plt
+# As my Python Interpreter does not support PyMuPDF, I will use pdfplumber instead
 import pdfplumber  # Using pdfplumber instead of PyMuPDF
 import nltk
 from nltk.corpus import stopwords
@@ -100,16 +98,6 @@ class DocumentClustering:
             top_terms = [feature_names[i] for i in top_term_indices]
             cluster_terms[cluster_id] = top_terms
         return cluster_terms
-
-    # def identify_outliers(self, threshold=0.1):
-    #     distances = np.min(
-    #         [np.linalg.norm(self.tfidf_matrix.toarray() - center, axis=1)
-    #          for center in self.kmeans.cluster_centers_],
-    #         axis=0
-    #     )
-    #     outlier_indices = np.where(distances > threshold)[0]
-    #     outliers = [self.document_names[i] for i in outlier_indices]
-    #     return outliers
 
     def identify_outliers(self, percentile=95):
         distances = np.min(
@@ -433,15 +421,21 @@ class SyllabiAnalyzer:
         outliers = self.clustering.identify_outliers(percentile=95)
         total_docs = sum(len(docs) for docs in cluster_docs.values()) + len(outliers)
 
+        # Remove outliers from cluster_docs
+        for cluster_id in cluster_docs:
+            cluster_docs[cluster_id] = [doc for doc in cluster_docs[cluster_id] if doc not in outliers]
+
+        total_docs = sum(len(docs) for docs in cluster_docs.values()) + len(outliers)
+
         print("\nCluster Analysis:")
         print("-----------------")
         print(f"Total documents: {len(self.raw_documents)}")
         print(f"Documents in clusters + outliers: {total_docs}")
 
         common_terms = {'student', 'class', 'exam', 'academic', 'assignment', 'chapter',
-                   'grade', 'http', 'may', 'final', 'course', 'will', 'credit',
-                   'material', 'instructor', 'university', 'quiz', 'policy', 'please',
-                   'lecture', 'week', 'required', 'note', 'information', 'time'}
+                        'grade', 'http', 'may', 'final', 'course', 'will',
+                        'material', 'case', 'instructor', 'university', 'quiz', 'policy',
+                        'please', 'lecture', 'week'}
 
         accounting_terms = {'accounting', 'balance', 'statement', 'ledger', 'debit', 'credit',
                             'taxation', 'ifrs', 'gaap', 'audit', 'bookkeeping', 'accrual',
@@ -455,17 +449,24 @@ class SyllabiAnalyzer:
 
         cluster_mapping = {}
         for cluster_id, terms in cluster_terms.items():
-            # 简单判断：如果"accounting"是前五个词之一，直接归为会计
             if "accounting" in terms[:5]:
                 cluster_label = "Accounting"
                 cluster_mapping[cluster_id] = cluster_label
+
+                display_terms = []
+                term_index = 0
+                while len(display_terms) < 10 and term_index < len(terms):
+                    if terms[term_index] not in common_terms or len(display_terms) >= sum(
+                            1 for t in terms if t not in common_terms):
+                        display_terms.append(terms[term_index])
+                    term_index += 1
+
                 print(f"\nCluster {cluster_id} (likely {cluster_label} - 'accounting' found in top terms):")
                 print(f"Number of documents: {len(cluster_docs[cluster_id])}")
-                print(f"Top terms: {', '.join(terms[:10])}")
+                print(f"Top terms: {', '.join(display_terms)}")
                 print(f"Sample documents: {', '.join(cluster_docs[cluster_id][:3])}")
                 continue
 
-            # 否则基于术语计数
             specific_terms = [term for term in terms if term not in common_terms]
             accounting_count = sum(1 for term in specific_terms[:20] if term in accounting_terms)
             finance_count = sum(1 for term in specific_terms[:20] if term in finance_terms)
@@ -477,10 +478,16 @@ class SyllabiAnalyzer:
 
             cluster_mapping[cluster_id] = cluster_label
 
+            display_terms = []
+            term_index = 0
+            while len(display_terms) < 10 and term_index < len(terms):
+                if terms[term_index] not in common_terms or len(display_terms) >= len(specific_terms):
+                    display_terms.append(terms[term_index])
+                term_index += 1
+
             print(f"\nCluster {cluster_id} (likely {cluster_label}):")
             print(f"Number of documents: {len(cluster_docs[cluster_id])}")
-            print(f"Top terms: {', '.join(terms[:10])}")
-            print(f"Top specific terms: {', '.join(specific_terms[:10])}")
+            print(f"Top terms: {', '.join(display_terms)}")
             print(f"Accounting terms: {accounting_count}, Finance terms: {finance_count}")
             print(f"Sample documents: {', '.join(cluster_docs[cluster_id][:3])}")
 
@@ -491,6 +498,7 @@ class SyllabiAnalyzer:
 
         self.similarity_classifier.cluster_mapping = cluster_mapping
         return cluster_mapping
+
 
     def perform_topic_modeling(self):
         print("\nPerforming topic modeling...")
