@@ -1,13 +1,10 @@
 import os
 import re
 import numpy as np
-import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA, LatentDirichletAllocation, TruncatedSVD
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.preprocessing import normalize
-import matplotlib.pyplot as plt
 import pdfplumber  # Using pdfplumber instead of PyMuPDF
 import nltk
 from nltk.corpus import stopwords
